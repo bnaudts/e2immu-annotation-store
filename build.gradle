@@ -16,10 +16,11 @@ plugins {
     id 'java'
     id 'application'
     id 'maven-publish'
+    id 'org.e2immu.analyser'
 }
 
 group 'org.e2immu'
-version '0.1.0'
+version '0.1.2'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -28,9 +29,15 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/e2immu/e2immu-support")
+    }
 }
 
 dependencies {
+    implementation group: 'org.e2immu', name: 'e2immu-support', version: '0.1.0'      // LGPL 3.0
+    
     implementation group: 'io.vertx', name: 'vertx-web', version: '3.8.5'
     implementation group: 'io.vertx', name: 'vertx-config', version: '3.8.5'
 
@@ -40,7 +47,7 @@ dependencies {
 }
 
 application {
-    mainClassName = 'org.e2immu.kvstore.Store'
+    mainClass.set('org.e2immu.kvstore.Store')
 
     // uncomment here to change port and read timing each time you execute
     //  gradle run
@@ -57,6 +64,10 @@ run {
     systemProperty "e2immu-read-within-millis", System.getProperty("e2immu-read-within-millis")
 }
 
+e2immu {
+    debug = "INSPECT,BYTECODE,ANALYSER"
+    jmods = 'java.base.jmod'
+}
 
 publishing {
     repositories {
