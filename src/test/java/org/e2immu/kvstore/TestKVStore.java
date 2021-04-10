@@ -18,21 +18,21 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.RunTestOnContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.ext.web.client.WebClient;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@RunWith(VertxUnitRunner.class)
+import java.util.logging.Logger;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(VertxExtension.class)
 public class TestKVStore {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestKVStore.class);
+    private static final Logger LOGGER = Logger.getLogger(TestKVStore.class.getCanonicalName());
 
     private static final String LOCALHOST = "localhost";
     private static final String PROJECT = "p1";
@@ -43,82 +43,75 @@ public class TestKVStore {
     private static final String CONTAINER = "container";
     private static final String E2IMMU = "e2immu";
 
-
-    @Rule
-    public RunTestOnContext rule = new RunTestOnContext();
-
     private static final Vertx vertxOfServer = Vertx.vertx();
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
         new Store(vertxOfServer);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() {
         vertxOfServer.close();
     }
 
     @Test
-    public void test_01_putOneKey(TestContext ctx) {
-        WebClient webClient = WebClient.create(rule.vertx());
-        Async async = ctx.async();
+    public void test_01_putOneKey(Vertx vertx, VertxTestContext vertxTestContext) {
+        WebClient webClient = WebClient.create(vertx);
         webClient.get(Store.DEFAULT_PORT, LOCALHOST, Store.API_VERSION + "/set/" + PROJECT + "/" + JAVA_UTIL_SET + "/" + CONTAINER)
                 .send(ar -> {
                     if (ar.failed()) {
-                        LOGGER.error("Failure: {}", ar.cause().getMessage());
+                        LOGGER.severe("Failure: " + ar.cause().getMessage());
                         ar.cause().printStackTrace();
-                        ctx.fail();
+                        fail();
                     } else {
-                        ctx.assertTrue(ar.succeeded());
+                        assertTrue(ar.succeeded());
                         try {
                             JsonObject result = ar.result().bodyAsJsonObject();
                             if (ar.result().statusCode() != 200) {
-                                LOGGER.error("ERROR: " + result);
+                                LOGGER.severe("ERROR: " + result);
                             }
 
-                            ctx.assertEquals(200, ar.result().statusCode());
+                            assertEquals(200, ar.result().statusCode());
                             LOGGER.info("Got update summary: " + result);
                             int updated = result.getInteger("updated");
-                            ctx.assertEquals(1, updated);
+                            assertEquals(1, updated);
                         } catch (DecodeException decodeException) {
-                            LOGGER.error("Received: " + ar.result().bodyAsString());
-                            ctx.fail();
+                            LOGGER.severe("Received: " + ar.result().bodyAsString());
+                            fail();
                         }
                     }
-                    async.complete();
+                    vertxTestContext.completeNow();
                 });
     }
 
     @Test
-    public void test_02_getOneKey(TestContext ctx) {
-        WebClient webClient = WebClient.create(rule.vertx());
-        Async async = ctx.async();
+    public void test_02_getOneKey(Vertx vertx, VertxTestContext vertxTestContext) {
+        WebClient webClient = WebClient.create(vertx);
         webClient.get(Store.DEFAULT_PORT, LOCALHOST, Store.API_VERSION + "/get/" + PROJECT + "/" + JAVA_UTIL_SET)
                 .send(ar -> {
                     if (ar.failed()) {
-                        LOGGER.error("Failure: {}", ar.cause().getMessage());
+                        LOGGER.severe("Failure: " + ar.cause().getMessage());
                         ar.cause().printStackTrace();
-                        ctx.fail();
+                        fail();
                     } else {
-                        ctx.assertTrue(ar.succeeded());
+                        assertTrue(ar.succeeded());
                         JsonObject result = ar.result().bodyAsJsonObject();
                         if (ar.result().statusCode() != 200) {
-                            LOGGER.error("ERROR: " + result);
+                            LOGGER.severe("ERROR: " + result);
                         }
-                        ctx.assertEquals(200, ar.result().statusCode());
+                        assertEquals(200, ar.result().statusCode());
                         LOGGER.info("Got value for java.util.set: " + result);
                         String value = result.getString(JAVA_UTIL_SET);
-                        ctx.assertEquals(CONTAINER, value);
+                        assertEquals(CONTAINER, value);
                     }
-                    async.complete();
+                    vertxTestContext.completeNow();
                 });
     }
 
     @Test
-    public void test_03_putMultipleKeys(TestContext ctx) {
-        WebClient webClient = WebClient.create(rule.vertx());
-        Async async = ctx.async();
+    public void test_03_putMultipleKeys(Vertx vertx, VertxTestContext vertxTestContext) {
+        WebClient webClient = WebClient.create(vertx);
         JsonObject putObject = new JsonObject()
                 .put(JAVA_UTIL_SET, "new value")
                 .put(JAVA_UTIL_MAP, CONTAINER)
@@ -127,52 +120,51 @@ public class TestKVStore {
         webClient.put(Store.DEFAULT_PORT, LOCALHOST, Store.API_VERSION + "/set/" + PROJECT)
                 .sendBuffer(body, ar -> {
                     if (ar.failed()) {
-                        LOGGER.error("Failure: " + ar.cause().getMessage());
+                        LOGGER.severe("Failure: " + ar.cause().getMessage());
                         ar.cause().printStackTrace();
-                        ctx.fail();
+                        fail();
                     } else {
-                        ctx.assertTrue(ar.succeeded());
-                        ctx.assertEquals(200, ar.result().statusCode());
+                        assertTrue(ar.succeeded());
+                        assertEquals(200, ar.result().statusCode());
 
                         JsonObject result = ar.result().bodyAsJsonObject();
                         LOGGER.info("Got update summary: " + result);
                         int updated = result.getInteger("updated");
                         int ignored = result.getInteger("ignored");
                         int removed = result.getInteger("removed");
-                        ctx.assertEquals(3, updated);
-                        ctx.assertEquals(0, ignored);
-                        ctx.assertEquals(0, removed);
+                        assertEquals(3, updated);
+                        assertEquals(0, ignored);
+                        assertEquals(0, removed);
 
                     }
-                    async.complete();
+                    vertxTestContext.completeNow();
                 });
     }
 
     @Test
-    public void test_04_getOneKey_Expect2(TestContext ctx) {
-        WebClient webClient = WebClient.create(rule.vertx());
-        Async async = ctx.async();
+    public void test_04_getOneKey_Expect2(Vertx vertx, VertxTestContext vertxTestContext) {
+        WebClient webClient = WebClient.create(vertx);
         webClient.get(Store.DEFAULT_PORT, LOCALHOST, Store.API_VERSION + "/get/" + PROJECT + "/" + JAVA_UTIL_MAP)
                 .send(ar -> {
                     if (ar.failed()) {
-                        LOGGER.error("Failure: {}", ar.cause().getMessage());
+                        LOGGER.severe("Failure: " + ar.cause().getMessage());
                         ar.cause().printStackTrace();
-                        ctx.fail();
+                        fail();
                     } else {
-                        ctx.assertTrue(ar.succeeded());
+                        assertTrue(ar.succeeded());
                         JsonObject result = ar.result().bodyAsJsonObject();
                         if (ar.result().statusCode() != 200) {
-                            LOGGER.error("ERROR: " + result);
+                            LOGGER.severe("ERROR: " + result);
                         }
-                        ctx.assertEquals(200, ar.result().statusCode());
+                        assertEquals(200, ar.result().statusCode());
                         LOGGER.info("Got values: " + result);
-                        ctx.assertEquals(2, result.size());
+                        assertEquals(2, result.size());
                         String set = result.getString(JAVA_UTIL_SET);
-                        ctx.assertEquals("new value", set);
+                        assertEquals("new value", set);
                         String map = result.getString(JAVA_UTIL_MAP);
-                        ctx.assertEquals(CONTAINER, map);
+                        assertEquals(CONTAINER, map);
                     }
-                    async.complete();
+                    vertxTestContext.completeNow();
                 });
     }
 }

@@ -23,11 +23,12 @@ group 'org.e2immu'
 version '0.1.2'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         name = "GitHubPackages"
@@ -36,14 +37,24 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.e2immu', name: 'e2immu-support', version: '0.1.0'      // LGPL 3.0
+    implementation group: 'org.e2immu', name: 'e2immu-support', version: '0.1.2'      // LGPL 3.0
     
-    implementation group: 'io.vertx', name: 'vertx-web', version: '3.8.5'
-    implementation group: 'io.vertx', name: 'vertx-config', version: '3.8.5'
+    implementation group: 'io.vertx', name: 'vertx-web', version: '4.0.3'
+    implementation group: 'io.vertx', name: 'vertx-config', version: '4.0.3'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
-    testImplementation group: 'io.vertx', name: 'vertx-unit', version: '3.8.5'
-    testImplementation group: 'io.vertx', name: 'vertx-web-client', version: '3.8.5'
+    // TEST
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'                    // EPL v2.0
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    
+    testImplementation group: 'io.vertx', name: 'vertx-junit5', version: '4.0.3'
+    testImplementation group: 'io.vertx', name: 'vertx-web-client', version: '4.0.3'
+
+    testImplementation group: 'org.e2immu', name: 'analyser', version: '0.1.2'      // LGPL 3.0
+
+}
+
+test {
+    useJUnitPlatform()
 }
 
 application {
@@ -65,7 +76,7 @@ run {
 }
 
 e2immu {
-    debug = "INSPECT,BYTECODE,ANALYSER"
+    debug = "INSPECT,BYTECODE_INSPECTOR,ANALYSER"
     jmods = 'java.base.jmod'
 }
 
