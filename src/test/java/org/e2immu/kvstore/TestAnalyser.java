@@ -55,7 +55,7 @@ public class TestAnalyser {
                 .addClassPath(Input.JAR_WITH_PATH_PREFIX + "io/vertx/junit5");
         Configuration configuration = new Configuration.Builder()
                 .setDebugConfiguration(debugConfiguration)
-                .addDebugLogTargets(List.of(ANALYSER, INSPECT, BYTECODE_INSPECTOR).stream()
+                .addDebugLogTargets(List.of(ANALYSER, INSPECT, DELAYED).stream()
                         .map(Enum::toString).collect(Collectors.joining(",")))
                 .setInputConfiguration(inputConfigurationBuilder.build())
                 .build();
