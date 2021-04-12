@@ -37,6 +37,9 @@ dependencies {
     implementation group: 'io.vertx', name: 'vertx-config', version: '4.0.3'
 }
 
+/*
+ ./gradlew -b build-api.gradle runIoVertxAAPI
+ */
 task runIoVertxAAPI(type: JavaExec) {
     group = "Execution"
     description = "Prepare an AnnotatedAPI file for io.vertx.core"
@@ -50,7 +53,7 @@ task runIoVertxAAPI(type: JavaExec) {
 
     args('--classpath=' + reducedClassPath.join(":") + ":jmods/java.base.jmod",
             '-a',
-            "--write-annotated-api-packages='io.vertx.core'",
-            "--source=none'",
-            "-d=CONFIGURATION")
+            "--write-annotated-api-packages=io.vertx.core",
+            "--source=none",
+            "-d=CONFIGURATION,BYTECODE_INSPECTOR")
 }
