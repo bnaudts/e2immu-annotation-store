@@ -38,9 +38,30 @@ dependencies {
 }
 
 /*
- ./gradlew -b build-api.gradle runIoVertxAAPI
+ ./gradlew -b build-api.gradle runIoVertxInspected
  */
-task runIoVertxAAPI(type: JavaExec) {
+task runIoVertxInspected(type: JavaExec) {
+    group = "Execution"
+    description = "Prepare an AnnotatedAPI file for io.vertx.core, based on inspection"
+
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.e2immu.analyser.cli.Main'
+
+    Set<File> reducedClassPath = sourceSets.main.runtimeClasspath.toList()
+    reducedClassPath += sourceSets.test.runtimeClasspath
+    reducedClassPath.removeIf({ f -> f.path.contains("build/classes") || f.path.contains("build/resources") })
+
+    args('--classpath=' + reducedClassPath.join(":") + ":jmods/java.base.jmod",
+            '--write-annotated-api=INSPECTED',
+            "--write-annotated-api-packages=io.vertx.core",
+            "--source=none",
+            "-d=CONFIGURATION,BYTECODE_INSPECTOR")
+}
+
+/*
+ ./gradlew -b build-api.gradle runIoVertxUsage
+ */
+task runIoVertxUsage(type: JavaExec) {
     group = "Execution"
     description = "Prepare an AnnotatedAPI file for io.vertx.core"
 
@@ -52,8 +73,9 @@ task runIoVertxAAPI(type: JavaExec) {
     reducedClassPath.removeIf({ f -> f.path.contains("build/classes") || f.path.contains("build/resources") })
 
     args('--classpath=' + reducedClassPath.join(":") + ":jmods/java.base.jmod",
-            '-a',
-            "--write-annotated-api-packages=io.vertx.core",
-            "--source=none",
-            "-d=CONFIGURATION,BYTECODE_INSPECTOR")
+            '--write-annotated-api=USAGE',
+            '--write-annotated-api-destination-package=usage',
+            "--write-annotated-api-packages=io.vertx.",
+            "--source=src/main/java",
+            "-d=CONFIGURATION,BYTECODE_INSPECTOR,ANNOTATED_API_WRITER")
 }
