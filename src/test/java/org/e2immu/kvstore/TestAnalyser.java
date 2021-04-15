@@ -14,6 +14,7 @@
 
 package org.e2immu.kvstore;
 
+import org.e2immu.analyser.config.AnnotatedAPIConfiguration;
 import org.e2immu.analyser.config.Configuration;
 import org.e2immu.analyser.config.DebugConfiguration;
 import org.e2immu.analyser.config.InputConfiguration;
@@ -42,7 +43,10 @@ public class TestAnalyser {
     public void test() throws IOException {
         DebugConfiguration debugConfiguration = new DebugConfiguration.Builder().build();
         InputConfiguration.Builder inputConfigurationBuilder = new InputConfiguration.Builder()
-                .addSources("src/main/java")
+                .addSources("src/main/java/org/e2immu/kvstore")
+                .addRestrictSourceToPackages("org.e2immu.kvstore")
+
+
                 .addClassPath(InputConfiguration.DEFAULT_CLASSPATH)
                 .addClassPath(Input.JAR_WITH_PATH_PREFIX + "org/slf4j")
                 .addClassPath(Input.JAR_WITH_PATH_PREFIX + "org/junit/jupiter/api")
@@ -54,6 +58,10 @@ public class TestAnalyser {
                 .addClassPath(Input.JAR_WITH_PATH_PREFIX + "io/vertx/ext/bridge")
                 .addClassPath(Input.JAR_WITH_PATH_PREFIX + "io/vertx/junit5");
         Configuration configuration = new Configuration.Builder()
+                .setAnnotatedAPIConfiguration(new AnnotatedAPIConfiguration.Builder()
+                        .setWriteMode(AnnotatedAPIConfiguration.WriteMode.DO_NOT_WRITE)
+                        .addAnnotatedAPISourceDirs("src/main/java")
+                        .build())
                 .setDebugConfiguration(debugConfiguration)
                 .addDebugLogTargets(List.of(ANALYSER, INSPECT, DELAYED).stream()
                         .map(Enum::toString).collect(Collectors.joining(",")))
@@ -61,8 +69,8 @@ public class TestAnalyser {
                 .build();
         configuration.initializeLoggers();
         Parser parser = new Parser(configuration);
-        List<SortedType> types = parser.run();
-        for (SortedType sortedType : types) {
+        Parser.RunResult runResult = parser.run();
+        for (SortedType sortedType : runResult.sourceSortedTypes()) {
             OutputBuilder outputBuilder = sortedType.primaryType().output();
             Formatter formatter = new Formatter(FormattingOptions.DEFAULT);
             System.out.println(formatter.write(outputBuilder));
