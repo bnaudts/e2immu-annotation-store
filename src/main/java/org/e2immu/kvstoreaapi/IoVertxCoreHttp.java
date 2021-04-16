@@ -24,8 +24,8 @@ public class IoVertxCoreHttp {
 
     static class HttpServer$ {
         @Fluent
-        //@Modified // FIXME causes infinite loop
-        HttpServer requestHandler(@NotNull Handler<HttpServerRequest> handler) { return null; }
+        @Modified // NOTE: Causes infinite loop if @NotModified is not on the first parameter
+        HttpServer requestHandler(@NotModified @NotNull Handler<HttpServerRequest> handler) { return null; }
 
         @NotNull
         Future<HttpServer> listen(int i) { return null; }

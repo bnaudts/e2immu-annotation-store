@@ -43,7 +43,8 @@ public class IoVertxExtWeb {
         Route route() { return null; }
 
         @NotNull
-      //  @Modified FIXME causes infinite loop
+        @NotModified // @NM no problem, @Mod problem; parameters don't matter because both are @E2Container
+        // https://github.com/e2immu/e2immu/issues/45
         Route route(@NotNull HttpMethod httpMethod, @NotNull String string) { return null; }
     }
 
