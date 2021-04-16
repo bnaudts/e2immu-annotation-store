@@ -41,7 +41,7 @@ public class Store {
     public Store(Vertx vertx) {
         this.vertx = vertx;
         ConfigRetriever retriever = ConfigRetriever.create(vertx);
-     /*   retriever.getConfig(ar -> {
+        retriever.getConfig(ar -> {
             if (ar.failed()) {
                 // Failed to retrieve the configuration
                 LOGGER.severe("Cannot retrieve configuration");
@@ -52,9 +52,9 @@ public class Store {
                 this.readWithinMillis = flexible(config.getValue("e2immu-read-within-millis"), DEFAULT_READ_WITHIN_MILLIS);
                 initServer(port);
             }
-        });*/
+        });
     }
-/*
+
     private static long flexible(Object object, long defaultValue) {
         LOGGER.info("Parsing " + object);
         if (object == null) return defaultValue;
@@ -66,12 +66,12 @@ public class Store {
             return defaultValue;
         }
     }
-*/
+
     private void initServer(int port) {
         HttpServer server = vertx.createHttpServer();
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
-/*
+
         router.route(HttpMethod.GET, API_VERSION + "/get/:project/:element").handler(rc -> {
             String project = rc.pathParam("project");
             String element = rc.pathParam("element");
@@ -82,12 +82,12 @@ public class Store {
             String element = rc.pathParam("element");
             String annotation = rc.pathParam("annotation");
             handleSet(rc, project, element, annotation);
-        });*/
+        });
         router.route(HttpMethod.POST, API_VERSION + "/get/:project").handler(rc -> {
             String project = rc.pathParam("project");
             JsonArray body = rc.getBodyAsJsonArray();
             handleMultiGet(rc, project, body);
-        });/*
+        });
         router.route(HttpMethod.PUT, API_VERSION + "/set/:project").handler(rc -> {
             String project = rc.pathParam("project");
             JsonObject body = rc.getBodyAsJson();
@@ -98,7 +98,6 @@ public class Store {
             handleListProject(rc, project);
         });
         router.route(HttpMethod.GET, API_VERSION + "/list").handler(this::handleListProjects);
-**/
         server.requestHandler(router).listen(port);
         LOGGER.info("Started kv server on port " + port + "; read-within-millis " + readWithinMillis);
     }
@@ -113,7 +112,7 @@ public class Store {
         LOGGER.info("Created new project " + projectName);
         return newProject;
     }
-/*
+
     private static void ok(RoutingContext rc, JsonObject jsonObject) {
         List<String> list = rc.queryParam("nice");
         boolean nice = !list.isEmpty();
@@ -190,10 +189,10 @@ public class Store {
     private void handleGet(RoutingContext rc, String projectName, String element) {
         handleMultiGet(rc, projectName, new JsonArray().add(element));
     }
-*/
+
     private void handleMultiGet(RoutingContext rc, String projectName, JsonArray body) {
         Project project = getOrCreate(projectName);
-  /*      JsonObject result = new JsonObject();
+        JsonObject result = new JsonObject();
         Set<String> queried = new HashSet<>();
         for (Object element : body.getList()) {
             if (element instanceof String) {
@@ -207,11 +206,11 @@ public class Store {
         for (Map.Entry<String, String> entry : recent.entrySet()) {
             result.put(entry.getKey(), entry.getValue());
         }
-        ok(rc, result);*/
+        ok(rc, result);
     }
-/*
+
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
         new Store(vertx);
-    }*/
+    }
 }

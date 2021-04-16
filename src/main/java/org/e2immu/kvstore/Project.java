@@ -14,8 +14,7 @@
 
 package org.e2immu.kvstore;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import java.util.logging.Logger;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 public class Project {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Project.class);
+    private static final Logger LOGGER = Logger.getLogger(Project.class.getCanonicalName());
 
     static class Container {
         final String value;
@@ -53,15 +52,15 @@ public class Project {
         if (prev == null) {
             Container container = new Container(value, null);
             kvStore.put(key, container);
-            LOGGER.debug("Initialized value of key " + key + " to " + value);
+            LOGGER.fine("Initialized value of key " + key + " to " + value);
             return null;
         }
         if (!prev.value.equals(value)) {
             Container container = new Container(value, prev.read);
             kvStore.put(key, container);
-            LOGGER.debug("Updated value of key " + key + " to " + value);
+            LOGGER.fine("Updated value of key " + key + " to " + value);
         } else {
-            LOGGER.debug("Value of key " + key + " has stayed the same at " + value);
+            LOGGER.fine("Value of key " + key + " has stayed the same at " + value);
         }
         return prev.value;
     }
@@ -69,17 +68,17 @@ public class Project {
     public String get(String key) {
         Container container = kvStore.get(key);
         if (container == null) {
-            LOGGER.debug("Key " + key + " has no value");
+            LOGGER.fine("Key " + key + " has no value");
             return null;
         }
         container.read = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        LOGGER.debug("Read key " + key + ": " + container.value);
+        LOGGER.fine("Read key " + key + ": " + container.value);
         return container.value;
     }
 
     public String remove(String key) {
         Container container = kvStore.remove(key);
-        LOGGER.debug("Removed key " + key);
+        LOGGER.fine("Removed key " + key);
         return container == null ? null : container.value;
     }
 
@@ -96,7 +95,7 @@ public class Project {
                 }
             }
         }
-        LOGGER.debug("Added " + result.size() + " kv entries which were recently read before having been updated");
+        LOGGER.fine("Added " + result.size() + " kv entries which were recently read before having been updated");
         return result;
     }
 
