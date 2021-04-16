@@ -26,10 +26,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Store {
     public static final String API_VERSION = "/v1";
@@ -119,10 +116,12 @@ public class Store {
     }
 
     private static void ok(RoutingContext rc, JsonObject jsonObject) {
+        List<String> list = rc.queryParam("nice");
+        boolean nice = !list.isEmpty();
         rc.response()
                 .putHeader("content-type", "application/json")
                 .setStatusCode(200)
-                .end(jsonObject.encode());
+                .end(nice ? jsonObject.encodePrettily() : jsonObject.encode());
     }
 
     private static void badRequest(RoutingContext rc, String message) {

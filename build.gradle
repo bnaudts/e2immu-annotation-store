@@ -84,7 +84,7 @@ e2immu {
     readAnnotatedAPIPackages = "org.e2immu.kvstoreaapi"
     writeAnnotationXML = true
     writeAnnotationXMLPackages = "org.e2immu."
-    upload = false
+    upload = true
 }
 
 publishing {
