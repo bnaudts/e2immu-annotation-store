@@ -28,10 +28,10 @@ import java.util.function.BiConsumer;
 public class Project {
     private static final Logger LOGGER = Logger.getLogger(Project.class.getCanonicalName());
 
-    static class Container {
+    private static class Container {
         final String value;
         final Instant updated;
-        volatile Instant read;
+        private volatile Instant read;
 
         public Container(String value, Instant previousRead) {
             this.value = value;

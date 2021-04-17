@@ -78,7 +78,7 @@ run {
 }
 
 e2immu {
-    debug = "INSPECT,BYTECODE_INSPECTOR,ANALYSER,DELAYED"
+    debug = "OUTPUT" //INSPECT,BYTECODE_INSPECTOR,ANALYSER,DELAYED"
     jmods = 'java.base.jmod,java.logging.jmod'
     sourcePackages = "org.e2immu.kvstore"
     readAnnotatedAPIPackages = "org.e2immu.kvstoreaapi"

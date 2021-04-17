@@ -52,7 +52,7 @@ task runIoVertxInspected(type: JavaExec) {
     reducedClassPath += sourceSets.test.runtimeClasspath
     reducedClassPath.removeIf({ f -> f.path.contains("build/classes") || f.path.contains("build/resources") })
 
-    args('--classpath=' + reducedClassPath.join(":") + ":jmods/java.base.jmod",
+    args('--classpath=' + reducedClassPath.join(":") + ":jmods/java.base.jmod:jmods/java.logging.jmod",
             '--write-annotated-api=INSPECTED',
             "--write-annotated-api-packages=io.vertx.core",
             "--source=none",
@@ -73,10 +73,10 @@ task runIoVertxUsage(type: JavaExec) {
     reducedClassPath += sourceSets.test.runtimeClasspath
     reducedClassPath.removeIf({ f -> f.path.contains("build/classes") || f.path.contains("build/resources") })
 
-    args('--classpath=' + reducedClassPath.join(":") + ":jmods/java.base.jmod",
+    args('--classpath=' + reducedClassPath.join(":") + ":jmods/java.base.jmod:jmods/java.logging.jmod",
             '--write-annotated-api=USAGE',
-            '--write-annotated-api-destination-package=usage',
-            "--write-annotated-api-packages=io.vertx.",
+            '--write-annotated-api-destination-package=org.e2immu.kvstoreaapi',
+            "--write-annotated-api-packages=io.vertx.,java.util.logging,java.time.",
             "--source=src/main/java",
             "--source-packages=org.e2immu.kvstore",
             "-d=CONFIGURATION,BYTECODE_INSPECTOR,ANNOTATED_API_WRITER")
