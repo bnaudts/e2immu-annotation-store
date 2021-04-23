@@ -21,9 +21,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.logging.Logger;
@@ -31,6 +29,7 @@ import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(VertxExtension.class)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestKVStore {
     private static final Logger LOGGER = Logger.getLogger(TestKVStore.class.getCanonicalName());
 
@@ -43,27 +42,25 @@ public class TestKVStore {
     private static final String CONTAINER = "container";
     private static final String E2IMMU = "e2immu";
 
-    private static final Vertx vertxOfServer = Vertx.vertx();
-
     @BeforeAll
-    public static void beforeClass() {
-        new Store(vertxOfServer);
+    public static void beforeClass(Vertx vertx) {
+        new Store(vertx);
     }
 
     @AfterAll
-    public static void afterClass() {
-        vertxOfServer.close();
+    public static void afterClass(Vertx vertx) {
+        vertx.close();
     }
 
     @Test
-    public void test_01_putOneKey(Vertx vertx, VertxTestContext vertxTestContext) {
+    public void test_01_putOneKey(Vertx vertx, VertxTestContext testContext) {
         WebClient webClient = WebClient.create(vertx);
-        webClient.get(Store.DEFAULT_PORT, LOCALHOST, Store.API_VERSION + "/set/" + PROJECT + "/" + JAVA_UTIL_SET + "/" + CONTAINER)
+        String requestURI = Store.API_VERSION + "/set/" + PROJECT + "/" + JAVA_UTIL_SET + "/" + CONTAINER;
+        webClient.get(Store.DEFAULT_PORT, LOCALHOST, requestURI)
                 .send(ar -> {
                     if (ar.failed()) {
                         LOGGER.severe("Failure: " + ar.cause().getMessage());
                         ar.cause().printStackTrace();
-                        fail();
                     } else {
                         assertTrue(ar.succeeded());
                         try {
@@ -78,15 +75,14 @@ public class TestKVStore {
                             assertEquals(1, updated);
                         } catch (DecodeException decodeException) {
                             LOGGER.severe("Received: " + ar.result().bodyAsString());
-                            fail();
                         }
+                        testContext.completeNow();
                     }
-                    vertxTestContext.completeNow();
                 });
     }
 
     @Test
-    public void test_02_getOneKey(Vertx vertx, VertxTestContext vertxTestContext) {
+    public void test_02_getOneKey(Vertx vertx, VertxTestContext testContext) {
         WebClient webClient = WebClient.create(vertx);
         webClient.get(Store.DEFAULT_PORT, LOCALHOST, Store.API_VERSION + "/get/" + PROJECT + "/" + JAVA_UTIL_SET)
                 .send(ar -> {
@@ -105,7 +101,7 @@ public class TestKVStore {
                         String value = result.getString(JAVA_UTIL_SET);
                         assertEquals(CONTAINER, value);
                     }
-                    vertxTestContext.completeNow();
+                    testContext.completeNow();
                 });
     }
 

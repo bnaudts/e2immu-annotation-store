@@ -39,6 +39,9 @@ dependencies {
 }
 
 /*
+ Create annotated API files based on inspection only.
+ All methods and fields will be included.
+ 
  ./gradlew -b build-api.gradle runIoVertxInspected
  */
 task runIoVertxInspected(type: JavaExec) {
@@ -60,6 +63,8 @@ task runIoVertxInspected(type: JavaExec) {
 }
 
 /*
+ Create annotated API files based on actual usage. The resulting files will be much smaller.
+
  ./gradlew -b build-api.gradle runIoVertxUsage
  */
 task runIoVertxUsage(type: JavaExec) {
@@ -68,6 +73,9 @@ task runIoVertxUsage(type: JavaExec) {
 
     classpath = sourceSets.main.runtimeClasspath
     main = 'org.e2immu.analyser.cli.Main'
+
+    // demo: change the locale so that errors appear in a different language
+    //jvmArgs("-Duser.country=BE", "-Duser.language=nl")
 
     Set<File> reducedClassPath = sourceSets.main.runtimeClasspath.toList()
     reducedClassPath += sourceSets.test.runtimeClasspath
