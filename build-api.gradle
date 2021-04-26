@@ -31,8 +31,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.e2immu', name: 'analyser-cli', version: '0.1.2'      // LGPL 3.0
-    implementation group: 'org.e2immu', name: 'e2immu-support', version: '0.1.2'    // LGPL 3.0
+    implementation group: 'org.e2immu', name: 'analyser-cli', version: '0.2.0'      // LGPL 3.0
+    implementation group: 'org.e2immu', name: 'e2immu-support', version: '0.2.0'    // LGPL 3.0
 
     implementation group: 'io.vertx', name: 'vertx-web', version: '4.0.3'
     implementation group: 'io.vertx', name: 'vertx-config', version: '4.0.3'

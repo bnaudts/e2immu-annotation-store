@@ -20,7 +20,7 @@ plugins {
 }
 
 group 'org.e2immu'
-version '0.1.2'
+version '0.2.0'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_16
@@ -37,11 +37,12 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.e2immu', name: 'e2immu-support', version: '0.1.2'      // LGPL 3.0
+    implementation group: 'org.e2immu', name: 'e2immu-support', version: '0.2.0'      // LGPL 3.0
     
     implementation group: 'io.vertx', name: 'vertx-web', version: '4.0.3'
     implementation group: 'io.vertx', name: 'vertx-config', version: '4.0.3'
 
+    // HELP! THIS IS NOT THE RIGHT WAY TO DO THINGS
     implementation(files('annotation-xml-0.1.2.jar'))
 
     // TEST
@@ -51,7 +52,7 @@ dependencies {
     testImplementation group: 'io.vertx', name: 'vertx-junit5', version: '4.0.3'
     testImplementation group: 'io.vertx', name: 'vertx-web-client', version: '4.0.3'
 
-    testImplementation group: 'org.e2immu', name: 'analyser', version: '0.1.2'      // LGPL 3.0
+    testImplementation group: 'org.e2immu', name: 'analyser', version: '0.2.0'      // LGPL 3.0
 
 }
 
